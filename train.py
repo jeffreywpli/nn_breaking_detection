@@ -11,14 +11,20 @@ from keras.optimizers import SGD
 from keras.callbacks import LearningRateScheduler
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
-
+import sys
 import tensorflow as tf
+
+# Fix Random Seed
+np.random.seed(1)
+tf.set_random_seed(1)
+
+# Load Parameters
+dataset = sys.argv[1]
 
 def train(data, Model, file_name, num_epochs=50, batch_size=128, init=None):
     def fn(correct, predicted):
         return tf.nn.softmax_cross_entropy_with_logits(labels=correct,
                                                        logits=predicted)
-
     model = Model(None).model
     print(model.summary())
 
@@ -64,6 +70,7 @@ def train(data, Model, file_name, num_epochs=50, batch_size=128, init=None):
 
     return model
 
-if __name__ == "__main__":
-    train(MNIST(), MNISTModel, "models/mnist", num_epochs=30)
-    train(CIFAR(), CIFARModel, "models/cifar", num_epochs=300)
+if dataset == "MNIST":
+    train(MNIST(), MNISTModel, "MNIST", num_epochs=30)
+elif dataset == "CIFAR":
+    train(CIFAR(), CIFARModel, "CIFAR", num_epochs=300)

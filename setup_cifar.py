@@ -5,7 +5,6 @@
 ## This program is licenced under the BSD 2-Clause licence,
 ## contained in the LICENCE file in this directory.
 
-
 import tensorflow as tf
 import numpy as np
 import os
@@ -17,8 +16,8 @@ import urllib.request
 from resnet import ResnetBuilder
 from keras.layers import Dropout
 
-def load_batch(fpath, label_key='labels'):
-    f = open(fpath, 'rb')
+def load_batch(fpath, label_key="labels"):
+    f = open(fpath, "rb")
     d = pickle.load(f, encoding="bytes")
     for k, v in d.items():
         del(d[k])
@@ -49,7 +48,6 @@ def load_batch(fpath):
         arr = np.fromstring(f[i*size:(i+1)*size],dtype=np.uint8)
         lab = np.identity(10)[arr[0]]
         img = arr[1:].reshape((3,32,32)).transpose((1,2,0))
-
         labels.append(lab)
         images.append((img/255)-.5)
     return np.array(images),np.array(labels)
@@ -60,21 +58,20 @@ class CIFAR:
         train_data = []
         train_labels = []
         
-        if not os.path.exists("cifar-10-batches-bin"):
-            urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz",
-                                       "cifar-data.tar.gz")
-            os.popen("tar -xzf cifar-data.tar.gz").read()
+        if not os.path.exists("../Datasets/CIFAR-10"):
+            os.mkdir("../Datasets/CIFAR-10")
+            urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz", "../Datasets/CIFAR-10/cifar-data.tar.gz")
+            os.popen("tar -xzf ../Datasets/CIFAR-10/cifar-data.tar.gz -C ../Datasets/CIFAR-10").read()
             
-
         for i in range(5):
-            r,s = load_batch("cifar-10-batches-bin/data_batch_"+str(i+1)+".bin")
+            r,s = load_batch("../Datasets/CIFAR-10/cifar-10-batches-bin/data_batch_"+str(i+1)+".bin")
             train_data.extend(r)
             train_labels.extend(s)
             
         train_data = np.array(train_data,dtype=np.float32)
         train_labels = np.array(train_labels)
         
-        self.test_data, self.test_labels = load_batch("cifar-10-batches-bin/test_batch.bin")
+        self.test_data, self.test_labels = load_batch("../Datasets/CIFAR-10/cifar-10-batches-bin/test_batch.bin")
         
         VALIDATION_SIZE = 5000
         
@@ -89,8 +86,7 @@ class CIFARModel:
         self.image_size = 32
         self.num_labels = num_labels
 
-        model = ResnetBuilder.build_resnet_32((3, 32, 32), num_labels, activation=False,
-                                              Dropout=Dropout)
+        model = ResnetBuilder.build_resnet_32((3, 32, 32), num_labels, activation=False, Dropout=Dropout)
 
         if restore != None:
             model.load_weights(restore)
@@ -99,5 +95,4 @@ class CIFARModel:
 
     def predict(self, data):
         return self.model(data)
-        
-    
+

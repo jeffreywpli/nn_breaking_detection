@@ -38,20 +38,19 @@ def extract_labels(filename, num_images):
 
 class MNIST:
     def __init__(self):
-        if not os.path.exists("data"):
-            os.mkdir("data")
+        if not os.path.exists("../Datasets/MNIST"):
+            os.mkdir("../Datasets/MNIST")
             files = ["train-images-idx3-ubyte.gz",
                      "t10k-images-idx3-ubyte.gz",
                      "train-labels-idx1-ubyte.gz",
                      "t10k-labels-idx1-ubyte.gz"]
             for name in files:
+                urllib.request.urlretrieve("http://yann.lecun.com/exdb/mnist/" + name, "../Datasets/MNIST/" + name)
 
-                urllib.request.urlretrieve('http://yann.lecun.com/exdb/mnist/' + name, "data/"+name)
-
-        train_data = extract_data("data/train-images-idx3-ubyte.gz", 60000)
-        train_labels = extract_labels("data/train-labels-idx1-ubyte.gz", 60000)
-        self.test_data = extract_data("data/t10k-images-idx3-ubyte.gz", 10000)
-        self.test_labels = extract_labels("data/t10k-labels-idx1-ubyte.gz", 10000)
+        train_data = extract_data("../Datasets/MNIST/train-images-idx3-ubyte.gz", 60000)
+        train_labels = extract_labels("../Datasets/MNIST/train-labels-idx1-ubyte.gz", 60000)
+        self.test_data = extract_data("../Datasets/MNIST/t10k-images-idx3-ubyte.gz", 10000)
+        self.test_labels = extract_labels("../Datasets/MNIST/t10k-labels-idx1-ubyte.gz", 10000)
         
         VALIDATION_SIZE = 5000
         
@@ -72,14 +71,14 @@ class MNISTModel:
         nb_filters = 64
         layers = [Conv2D(nb_filters, (5, 5), strides=(2, 2), padding="same",
                          input_shape=(28, 28, 1)),
-                  Activation('relu'),
+                  Activation("relu"),
                   Conv2D(nb_filters, (3, 3), strides=(2, 2), padding="valid"),
-                  Activation('relu'),
+                  Activation("relu"),
                   Conv2D(nb_filters, (3, 3), strides=(1, 1), padding="valid"),
-                  Activation('relu'),
+                  Activation("relu"),
                   Flatten(),
                   Dense(32),
-                  Activation('relu'),
+                  Activation("relu"),
                   Dropout(.5),
                   Dense(num_labels)]
 
